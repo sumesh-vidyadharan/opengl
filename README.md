@@ -10,4 +10,3 @@
     * Open the MSYS2 UCRT64 terminal and run the command **pacman -S --needed base-devel mingw-w64-x86_64-toolchain** in the terminal. Proceed the installation with default options. This will install all the required compiler toolchain.
     * Add the path {MSYS2 installation folder}\mingw64\bin to the PATH environment variable.
     * To check that your Mingw-w64 tools are correctly installed and available, open a new Command Prompt and type **g++ --version**
-4. Install [git](https://git-scm.com/download/win), if not installed
