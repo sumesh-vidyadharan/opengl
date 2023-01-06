@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 #include <iostream>
 
-const unsigned int screen_width = 800;
-const unsigned int screen_height = 600;
+auto constexpr screen_width = 800;
+auto constexpr screen_height = 600;
 
 void error_callback(int error, const char *description)
 {
@@ -15,6 +15,8 @@ void error_callback(int error, const char *description)
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    std::cerr << "width: " << width << std::endl;
+    std::cerr << "height: " << height << std::endl;
 }
 
 int main()
@@ -22,12 +24,16 @@ int main()
     glfwSetErrorCallback(error_callback);
 
     // Initialize and configure glfw
-    glfwInit();
+    if (!glfwInit())
+    {
+        std::cout << "Failed to initialize glfw" << std::endl;
+        return -1;
+    }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // OpenGL version 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    GLFWwindow *window = glfwCreateWindow(screen_width, screen_height, "OpenGL", nullptr, nullptr);
+    auto window = glfwCreateWindow(screen_width, screen_height, "OpenGL", nullptr, nullptr);
     if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -48,7 +54,7 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // Set color for the window
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Swap buffers
