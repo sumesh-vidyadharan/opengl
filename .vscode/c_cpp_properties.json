@@ -3,7 +3,6 @@
         {
             "name": "Windows",
             "includePath": [
-                "${workspaceFolder}/third_party/glew-2.1.0/include",
                 "${workspaceFolder}/third_party/glfw-3.3.8/include",
                 "${workspaceFolder}/third_party/glad/include",
                 "${workspaceFolder}/third_party/glm/include"
