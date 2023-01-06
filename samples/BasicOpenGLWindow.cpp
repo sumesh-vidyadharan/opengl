@@ -2,14 +2,10 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <iostream>
+#include <memory>
 
 auto constexpr screen_width = 800;
 auto constexpr screen_height = 600;
-
-void error_callback(int error, const char *description)
-{
-    std::cerr << "Error: " << description << std::endl;
-}
 
 // Whenever the window size changed this callback function executes
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -19,15 +15,13 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     std::cerr << "height: " << height << std::endl;
 }
 
-int main()
+GLFWwindow *createAndConfigureWindow()
 {
-    glfwSetErrorCallback(error_callback);
-
     // Initialize and configure glfw
     if (!glfwInit())
     {
         std::cout << "Failed to initialize glfw" << std::endl;
-        return -1;
+        return nullptr;
     }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // OpenGL version 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -38,18 +32,14 @@ int main()
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        return 1;
+        return nullptr;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    return window;
+}
 
-    // Load all OpenGL function pointers
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return 1;
-    }
-
+void render(GLFWwindow *window)
+{
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -62,10 +52,32 @@ int main()
         // Poll IO events
         glfwPollEvents();
     }
+}
 
-    // Delete the created window
-    glfwDestroyWindow(window);
-    // Terminate glfw
-    glfwTerminate();
+int main()
+{
+    auto glfw_window_deleter = [](GLFWwindow *window)
+    {
+        // Delete the created window
+        glfwDestroyWindow(window);
+        // Terminate glfw
+        glfwTerminate();
+    };
+    std::unique_ptr<GLFWwindow, decltype(glfw_window_deleter)> window(createAndConfigureWindow(), glfw_window_deleter);
+    if (!window)
+    {
+        return 1;
+    }
+    glfwSetFramebufferSizeCallback(window.get(), framebuffer_size_callback);
+
+    // Load all OpenGL function pointers
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return 1;
+    }
+
+    render(window.get());
+
     return 0;
 }
