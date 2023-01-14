@@ -19,6 +19,7 @@ const char *vertexShaderSource = "#version 330 core\n"
                                  "{\n"
                                  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                  "}\0";
+
 const char *fragmentShaderSource = "#version 330 core\n"
                                    "layout(location = 0) out vec4 gl_FragColor;\n"
                                    "uniform vec4 uFillColor;\n"
