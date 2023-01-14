@@ -21,11 +21,11 @@ const char *vertexShaderSource = "#version 330 core\n"
                                  "}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"
-                                   "layout(location = 0) out vec4 gl_FragColor;\n"
+                                   "out vec4 FragColor;\n"
                                    "uniform vec4 uFillColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "   gl_FragColor = uFillColor;\n"
+                                   "   FragColor = uFillColor;\n"
                                    "}\n\0";
 
 // Whenever the window size changed this callback function executes
