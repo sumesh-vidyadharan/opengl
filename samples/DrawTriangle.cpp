@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <cmath>
 
 auto constexpr screen_width = 800;
 auto constexpr screen_height = 600;
@@ -19,10 +20,11 @@ const char *vertexShaderSource = "#version 330 core\n"
                                  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                  "}\0";
 const char *fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
+                                   "layout(location = 0) out vec4 gl_FragColor;\n"
+                                   "uniform vec4 uFillColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "   FragColor = vec4(1.0f, 0.8f, 0.0f, 1.0f);\n"
+                                   "   gl_FragColor = uFillColor;\n"
                                    "}\n\0";
 
 // Whenever the window size changed this callback function executes
@@ -56,7 +58,7 @@ GLFWwindow *createAndConfigureWindow()
 
 void setupTriangle()
 {
-    // Build and compile our shader program
+    // Build and compile shader program
     // Vertex shader
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
@@ -70,6 +72,7 @@ void setupTriangle()
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         throw std::runtime_error("Failed to compile vertex shader " + std::string(infoLog));
     }
+
     // Fragment shader
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
@@ -81,6 +84,7 @@ void setupTriangle()
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
         throw std::runtime_error("Failed to compile fragment shader " + std::string(infoLog));
     }
+
     // Link shaders
     shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
@@ -102,21 +106,26 @@ void setupTriangle()
         0.0f, 1.0f, 0.0f    // top
     };
 
+    // Mention the index of the elements in the vertex array that is to be used
     const unsigned int indices[] = {0, 1, 2};
 
     glGenVertexArrays(1, &triangleVertexArray);
-    glGenBuffers(1, &triangleVertexBuffer);
-    // Bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(triangleVertexArray);
+
+    // Create and bind buffer of vertex
+    glGenBuffers(1, &triangleVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, triangleVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    // Create and bind buffer of vertex indices
     glGenBuffers(1, &triangleElementBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleElementBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+    // Set the binded vertex array to vertex position attribute
     unsigned int aPos = glGetAttribLocation(shaderProgram, "aPos");
     glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    // Enable the vertex attribute array
     glEnableVertexAttribArray(aPos);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -125,7 +134,17 @@ void setupTriangle()
 
 void drawTriangle()
 {
+    // Set the set shader program
     glUseProgram(shaderProgram);
+
+    // Set the fill color to the shader
+    // Generate a random value for the color
+    auto timeValue = glfwGetTime();
+    auto redColor = static_cast<float>(cos(timeValue) / 2.0 + 0.5);
+    auto greenColor = static_cast<float>(sin(timeValue) / 2.0 + 0.5);
+    // Set the fill color to the shader
+    auto vertexColorLocation = glGetUniformLocation(shaderProgram, "uFillColor");
+    glUniform4f(vertexColorLocation, redColor, greenColor, 0.0f, 1.0f);
 
     glBindVertexArray(triangleVertexArray);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
