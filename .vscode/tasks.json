@@ -9,6 +9,7 @@
                 "-I${workspaceFolder}/third_party/glfw-3.3.8/include",
                 "-I${workspaceFolder}/third_party/glad/include",
                 "-I${workspaceFolder}/third_party/glm/include",
+                "-I${workspaceFolder}/third_party/stb",
                 "-L${workspaceFolder}/third_party/glfw-3.3.8/lib-vc2022",
                 "-fdiagnostics-color=always",
                 "-g",

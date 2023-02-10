@@ -55,6 +55,17 @@
         "xstddef": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "array": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "filesystem": "cpp",
+        "format": "cpp",
+        "forward_list": "cpp",
+        "map": "cpp",
+        "optional": "cpp",
+        "ratio": "cpp",
+        "sstream": "cpp",
+        "xtree": "cpp"
     }
 }
