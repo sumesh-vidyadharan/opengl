@@ -18,8 +18,8 @@ unsigned int triangleElementBuffer = 0;
 unsigned int triangleVertexArray = 0;
 // Shader variables
 unsigned int shaderProgram = 0;
-unsigned int vertexColorLocation = 0;
-unsigned int transformLocation = 0;
+unsigned int vertexColorShaderVar = 0;
+unsigned int modelShaderVar = 0;
 // Matrices
 glm::mat4 modelInitialTransformation(1.0f);
 
@@ -111,8 +111,8 @@ void setupTriangle()
     glDeleteShader(fragmentShader);
 
     // Get the shader variables
-    vertexColorLocation = glGetUniformLocation(shaderProgram, "uFillColor");
-    transformLocation = glGetUniformLocation(shaderProgram, "uTransform");
+    vertexColorShaderVar = glGetUniformLocation(shaderProgram, "uFillColor");
+    modelShaderVar = glGetUniformLocation(shaderProgram, "uTransform");
 
     // Set up vertex data and configure vertex attributes
     const float vertices[] = {
@@ -156,7 +156,7 @@ void drawTriangle(glm::mat4 const &parentTransformation, glm::mat4 const &initia
     glUseProgram(shaderProgram);
 
     // Set the fill color to the shader
-    glUniform4f(vertexColorLocation, fillColor[0], fillColor[1], fillColor[2], 1.0f);
+    glUniform4f(vertexColorShaderVar, fillColor[0], fillColor[1], fillColor[2], 1.0f);
 
     // Set the initial transformation
     auto modelTransformation{initialTransformation};
@@ -184,7 +184,7 @@ void drawTriangle(glm::mat4 const &parentTransformation, glm::mat4 const &initia
     // Final transformation = Parent transformation * Model transformation
     auto worldTransform = parentTransformation * modelTransformation;
 
-    glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(worldTransform));
+    glUniformMatrix4fv(modelShaderVar, 1, GL_FALSE, glm::value_ptr(worldTransform));
 
     glBindVertexArray(triangleVertexArray);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);

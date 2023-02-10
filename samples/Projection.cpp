@@ -4,6 +4,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -19,15 +20,19 @@ unsigned int triangleVertexArray = 0;
 unsigned int shaderProgram = 0;
 unsigned int vertexColorShaderVar = 0;
 unsigned int modelShaderVar = 0;
+unsigned int viewShaderVar = 0;
+unsigned int projectionShaderVar = 0;
 // Matrices
-glm::mat4 modelTransform(1.0f);
+glm::mat4 projection(1.0f);
 
 const char *vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
-                                 "uniform mat4 uTransform;\n"
+                                 "uniform mat4 uModel;\n"
+                                 "uniform mat4 uView;\n"
+                                 "uniform mat4 uProjection;\n"
                                  "void main()\n"
                                  "{\n"
-                                 "   gl_Position = uTransform * vec4(aPos, 1.0);\n"
+                                 "   gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0);\n"
                                  "}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"
@@ -111,13 +116,15 @@ void setupTriangle()
 
     // Get the shader variables
     vertexColorShaderVar = glGetUniformLocation(shaderProgram, "uFillColor");
-    modelShaderVar = glGetUniformLocation(shaderProgram, "uTransform");
+    modelShaderVar = glGetUniformLocation(shaderProgram, "uModel");
+    viewShaderVar = glGetUniformLocation(shaderProgram, "uView");
+    projectionShaderVar = glGetUniformLocation(shaderProgram, "uProjection");
 
     // Set up vertex data and configure vertex attributes
     const float vertices[] = {
         -1.0f, -1.0f, 0.0f,
         1.0f, -1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f};
+        0.0f, 1.0f, 0.0f,};
     const unsigned int indices[] = {0, 1, 2};
 
     glGenVertexArrays(1, &triangleVertexArray);
@@ -141,27 +148,19 @@ void setupTriangle()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    // Scale down the triangle a bit
-    modelTransform = glm::scale(modelTransform, glm::vec3(0.25f, 0.25f, 0.25f));
 }
 
-void drawTriangle()
+void drawTriangle(glm::mat4 const &modelTransformation, glm::vec3 const &fillColor)
 {
     // Set the set shader program
     glUseProgram(shaderProgram);
 
     // Set the fill color to the shader
-    // Generate a random value for the color
-    auto timeValue = glfwGetTime();
-    auto redColor = static_cast<float>(cos(timeValue) / 2.0 + 0.5);
-    auto greenColor = static_cast<float>(sin(timeValue) / 2.0 + 0.5);
-    // Set the fill color to the shader
-    glUniform4f(vertexColorShaderVar, redColor, greenColor, 0.0f, 1.0f);
+    glUniform4f(vertexColorShaderVar, fillColor[0], fillColor[1], fillColor[2], 1.0f);
 
-    // Rotate the current model in 1 degree on Y axis
-    modelTransform = glm::rotate(modelTransform, glm::radians(1.0f), glm::vec3(0.0, 1.0, 0.0));
-    glUniformMatrix4fv(modelShaderVar, 1, GL_FALSE, glm::value_ptr(modelTransform));
+    glUniformMatrix4fv(modelShaderVar, 1, GL_FALSE, glm::value_ptr(modelTransformation));
+    glUniformMatrix4fv(viewShaderVar, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+    glUniformMatrix4fv(projectionShaderVar, 1, GL_FALSE, glm::value_ptr(projection));
 
     glBindVertexArray(triangleVertexArray);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
@@ -176,9 +175,19 @@ void render(GLFWwindow *window)
     {
         // Set color for the window
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        drawTriangle();
+        auto initialScale = glm::scale(glm::mat4(1.0f), glm::vec3(0.25f, 0.25f, 0.25f));
+
+        // Draw Red triangle
+        auto redTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, 0.0f, -2.0f));
+        auto redTransformation = redTranslation * initialScale ;
+        drawTriangle(redTransformation, glm::vec3(1.0f, 0.0f, 0.0f));
+
+        // Draw Green triangle
+        auto greenTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(0.25f, 0.0f, -1.f));
+        auto greenTransformation = greenTranslation * initialScale;
+        drawTriangle(greenTransformation, glm::vec3(0.0f, 1.0f, 0.0f));
 
         // Swap buffers
         glfwSwapBuffers(window);
@@ -235,6 +244,16 @@ int main()
     {
         throw std::runtime_error("Failed to initialize GLAD");
     }
+
+    #if 1
+        const float aspectRatio = (float)screen_width/screen_height;
+        projection = glm::perspective(glm::radians(90.0f), aspectRatio, 0.1f, 100.0f);
+    #else
+        projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
+    #endif
+
+    glEnable(GL_DEPTH_TEST);
+
     setupTriangle();
 
     render(window.get());
