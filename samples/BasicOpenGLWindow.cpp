@@ -4,8 +4,8 @@
 #include <iostream>
 #include <memory>
 
-auto constexpr screen_width = 800;
-auto constexpr screen_height = 600;
+auto constexpr screenWidth = 800;
+auto constexpr screenHeight = 600;
 
 // Whenever the window size changed this callback function executes
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -27,7 +27,7 @@ GLFWwindow *createAndConfigureWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    auto window = glfwCreateWindow(screen_width, screen_height, "OpenGL", nullptr, nullptr);
+    auto window = glfwCreateWindow(screenWidth, screenHeight, "OpenGL", nullptr, nullptr);
     if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
