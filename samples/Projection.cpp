@@ -60,7 +60,7 @@ GLFWwindow *createAndConfigureWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    auto window = glfwCreateWindow(screen_width, screen_height, "Transformations", nullptr, nullptr);
+    auto window = glfwCreateWindow(screen_width, screen_height, "Projection", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
