@@ -27,7 +27,7 @@ GLFWwindow *createAndConfigureWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    auto window = glfwCreateWindow(screenWidth, screenHeight, "OpenGL", nullptr, nullptr);
+    auto window = glfwCreateWindow(screenWidth, screenHeight, "Basic Window", nullptr, nullptr);
     if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;

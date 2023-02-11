@@ -47,7 +47,7 @@ GLFWwindow *createAndConfigureWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    auto window = glfwCreateWindow(screenWidth, screenHeight, "OpenGL", nullptr, nullptr);
+    auto window = glfwCreateWindow(screenWidth, screenHeight, "Triangle", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();

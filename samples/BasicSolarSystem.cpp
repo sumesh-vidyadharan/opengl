@@ -93,7 +93,7 @@ GLFWwindow *createAndConfigureWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    auto window = glfwCreateWindow(screenWidth, screenHeight, "Transformations", nullptr, nullptr);
+    auto window = glfwCreateWindow(screenWidth, screenHeight, "Basic Solar System", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -322,7 +322,9 @@ void render(GLFWwindow *window)
         // We can move the Sun using the arrow keys (LEFT, RIGHT, UP and DOWN)
         auto sunTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(sunPositionX, sunPositionY, 0.0f));
         auto sunTransformation = sunTranslation * initialScale;
-        auto sunWorldTransformation = drawPlanet(glm::mat4(1.0f), sunTransformation, 0.0f, 0.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+        static float sunRotation = 0.0f;
+        sunRotation += 0.5f;
+        auto sunWorldTransformation = drawPlanet(glm::mat4(1.0f), sunTransformation, sunRotation, 0.0f, glm::vec3(1.0f, 1.0f, 0.0f));
 
         // Draw Earth as Sun as parent - EARTH
         auto earthTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 0.0f, 0.0f));
@@ -344,7 +346,7 @@ void render(GLFWwindow *window)
         auto moonWorldTransformation = drawPlanet(earthWorldTransformation, moonTransformation, moonRotation, moonRevolution, glm::vec3(0.8f, 0.8f, 0.8f));
 
         // Draw Mars as Sun as parent - RED
-        auto marsTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(20.0f, 0.0f, 0.0f));
+        auto marsTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(18.0f, 0.0f, 0.0f));
         // Scale up the Mars a bit
         auto marsScale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f, 1.5f, 1.5f));
         auto marsTransformation = marsTranslation * marsScale;
