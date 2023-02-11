@@ -6,12 +6,12 @@
 #include <stdexcept>
 #include <cmath>
 
-auto constexpr screen_width = 800;
-auto constexpr screen_height = 600;
+auto constexpr screenWidth = 800;
+auto constexpr screenHeight = 600;
 unsigned int shaderProgram = 0;
-unsigned int triangleVertexBuffer = 0;
-unsigned int triangleElementBuffer = 0;
-unsigned int triangleVertexArray = 0;
+unsigned int geometryVertexBuffer = 0;
+unsigned int geometryIndexBuffer = 0;
+unsigned int geometryVertexArrayObject = 0;
 
 const char *vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
@@ -45,7 +45,7 @@ GLFWwindow *createAndConfigureWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    auto window = glfwCreateWindow(screen_width, screen_height, "OpenGL", nullptr, nullptr);
+    auto window = glfwCreateWindow(screenWidth, screenHeight, "OpenGL", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -118,17 +118,17 @@ void setupRectangle()
     // V0     V1
     const unsigned int indices[] = {0, 1, 2, 1, 2, 3};
 
-    glGenVertexArrays(1, &triangleVertexArray);
-    glBindVertexArray(triangleVertexArray);
+    glGenVertexArrays(1, &geometryVertexArrayObject);
+    glBindVertexArray(geometryVertexArrayObject);
 
     // Create and bind buffer of vertex
-    glGenBuffers(1, &triangleVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, triangleVertexBuffer);
+    glGenBuffers(1, &geometryVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, geometryVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Create and bind buffer of vertex indices
-    glGenBuffers(1, &triangleElementBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleElementBuffer);
+    glGenBuffers(1, &geometryIndexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometryIndexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Set the binded vertex array to vertex position attribute
@@ -155,7 +155,7 @@ void drawRectangle()
     auto vertexColorLocation = glGetUniformLocation(shaderProgram, "uFillColor");
     glUniform4f(vertexColorLocation, redColor, greenColor, 0.0f, 1.0f);
 
-    glBindVertexArray(triangleVertexArray);
+    glBindVertexArray(geometryVertexArrayObject);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
@@ -181,21 +181,21 @@ void render(GLFWwindow *window)
 
 void cleanup()
 {
-    if (0 < triangleVertexArray)
+    if (0 < geometryVertexArrayObject)
     {
-        auto vertexArrays{triangleVertexArray};
+        auto vertexArrays{geometryVertexArrayObject};
         glDeleteVertexArrays(1, &vertexArrays);
     }
 
-    if (0 < triangleElementBuffer)
+    if (0 < geometryIndexBuffer)
     {
-        auto elementBuffers{triangleElementBuffer};
+        auto elementBuffers{geometryIndexBuffer};
         glDeleteBuffers(1, &elementBuffers);
     }
 
-    if (0 < triangleVertexBuffer)
+    if (0 < geometryVertexBuffer)
     {
-        auto vertexBuffers{triangleVertexBuffer};
+        auto vertexBuffers{geometryVertexBuffer};
         glDeleteBuffers(1, &vertexBuffers);
     }
 

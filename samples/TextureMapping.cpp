@@ -13,8 +13,8 @@
 #include <cmath>
 #include <filesystem>
 
-auto constexpr screen_width = 800;
-auto constexpr screen_height = 800;
+auto constexpr screenWidth = 800;
+auto constexpr screenHeight = 800;
 // OpenGL resources
 unsigned int vertexBuffer = 0;
 unsigned int elementBuffer = 0;
@@ -61,7 +61,7 @@ GLFWwindow *createAndConfigureWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    auto window = glfwCreateWindow(screen_width, screen_height, "Transformations", nullptr, nullptr);
+    auto window = glfwCreateWindow(screenWidth, screenHeight, "Transformations", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();

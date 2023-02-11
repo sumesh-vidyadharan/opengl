@@ -9,12 +9,12 @@
 #include <stdexcept>
 #include <cmath>
 
-auto constexpr screen_width = 800;
-auto constexpr screen_height = 600;
+auto constexpr screenWidth = 800;
+auto constexpr screenHeight = 600;
 // OpenGL resources
-unsigned int triangleVertexBuffer = 0;
-unsigned int triangleElementBuffer = 0;
-unsigned int triangleVertexArray = 0;
+unsigned int geometryVertexBuffer = 0;
+unsigned int geometryIndexBuffer = 0;
+unsigned int geometryVertexArrayObject = 0;
 // Shader variables
 unsigned int shaderProgram = 0;
 unsigned int vertexColorShaderVar = 0;
@@ -55,7 +55,7 @@ GLFWwindow *createAndConfigureWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     // Create window using glfw
-    auto window = glfwCreateWindow(screen_width, screen_height, "Transformations", nullptr, nullptr);
+    auto window = glfwCreateWindow(screenWidth, screenHeight, "Transformations", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -120,17 +120,17 @@ void setupTriangle()
         0.0f, 1.0f, 0.0f};
     const unsigned int indices[] = {0, 1, 2};
 
-    glGenVertexArrays(1, &triangleVertexArray);
-    glBindVertexArray(triangleVertexArray);
+    glGenVertexArrays(1, &geometryVertexArrayObject);
+    glBindVertexArray(geometryVertexArrayObject);
 
     // Create and bind buffer of vertex
-    glGenBuffers(1, &triangleVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, triangleVertexBuffer);
+    glGenBuffers(1, &geometryVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, geometryVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Create and bind buffer of vertex indices
-    glGenBuffers(1, &triangleElementBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleElementBuffer);
+    glGenBuffers(1, &geometryIndexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometryIndexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Set the binded vertex array to vertex position attribute
@@ -163,7 +163,7 @@ void drawTriangle()
     modelTransform = glm::rotate(modelTransform, glm::radians(1.0f), glm::vec3(0.0, 1.0, 0.0));
     glUniformMatrix4fv(modelShaderVar, 1, GL_FALSE, glm::value_ptr(modelTransform));
 
-    glBindVertexArray(triangleVertexArray);
+    glBindVertexArray(geometryVertexArrayObject);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
@@ -189,21 +189,21 @@ void render(GLFWwindow *window)
 
 void cleanup()
 {
-    if (0 < triangleVertexArray)
+    if (0 < geometryVertexArrayObject)
     {
-        auto vertexArrays{triangleVertexArray};
+        auto vertexArrays{geometryVertexArrayObject};
         glDeleteVertexArrays(1, &vertexArrays);
     }
 
-    if (0 < triangleElementBuffer)
+    if (0 < geometryIndexBuffer)
     {
-        auto elementBuffers{triangleElementBuffer};
+        auto elementBuffers{geometryIndexBuffer};
         glDeleteBuffers(1, &elementBuffers);
     }
 
-    if (0 < triangleVertexBuffer)
+    if (0 < geometryVertexBuffer)
     {
-        auto vertexBuffers{triangleVertexBuffer};
+        auto vertexBuffers{geometryVertexBuffer};
         glDeleteBuffers(1, &vertexBuffers);
     }
 
