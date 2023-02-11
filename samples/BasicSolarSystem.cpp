@@ -143,14 +143,14 @@ void setupTriangle()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    auto modelInitialScale = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
+    auto modelInitialScale = glm::scale(glm::mat4(1.0f), glm::vec3(0.75f, 0.75f, 0.75f));
     modelInitialTransformation = modelInitialScale * modelInitialTransformation;
 
     auto modelInitialTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.0f, 0.0f));
     modelInitialTransformation = modelInitialTranslation * modelInitialTransformation;
 }
 
-void drawTriangle(glm::mat4 const &parentTransformation, glm::mat4 const &initialTransformation, float const &rotation, float const &revolution, glm::vec3 const &fillColor)
+glm::mat4 drawTriangle(glm::mat4 const &parentTransformation, glm::mat4 const &initialTransformation, float const &rotation, float const &revolution, glm::vec3 const &fillColor)
 {
     // Set the set shader program
     glUseProgram(shaderProgram);
@@ -174,7 +174,7 @@ void drawTriangle(glm::mat4 const &parentTransformation, glm::mat4 const &initia
     auto modelScale = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
     modelTransformation = modelScale * modelTransformation;
 
-    // Traslate the model back to the original position
+    // Translate the model back to the original position
     modelTransformation = modelPosition * modelTransformation;
 
     // Revolution
@@ -190,6 +190,8 @@ void drawTriangle(glm::mat4 const &parentTransformation, glm::mat4 const &initia
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
+
+    return worldTransform;
 }
 
 void render(GLFWwindow *window)
@@ -206,27 +208,33 @@ void render(GLFWwindow *window)
         // Draw Sun
         static float sunPosition = 0.0f;
         // sunPosition += 0.001f;
-        auto sunInitialTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(sunPosition, 0.0f, 0.0f));
-        ;
-        auto sunIntialTransformation = sunInitialTranslation * initialScale;
-        drawTriangle(glm::mat4(1.0f), sunIntialTransformation, 0.0f, 0.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+        auto sunTranslation = glm::translate(glm::mat4(1.0f), glm::vec3(sunPosition, 0.0f, 0.0f));
+        auto sunTransformation = sunTranslation * initialScale;
+        auto sunWorldTransformation = drawTriangle(glm::mat4(1.0f), sunTransformation, 0.0f, 0.0f, glm::vec3(1.0f, 1.0f, 0.0f));
 
-        // Draw Earth
-        auto earthInitialTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
-        ;
+        // Draw Earth as Sun as parent
+        auto earthTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(6.0f, 0.0f, 0.0f));
         static float earthRotation = 0.0f;
         earthRotation += 1.0f;
         static float earthRevolution = 0.0f;
         earthRevolution += 1.0f;
-        drawTriangle(sunIntialTransformation, earthInitialTransformation, earthRotation, earthRevolution, glm::vec3(0.0f, 0.0f, 1.0f));
+        auto earthWorldTransformation = drawTriangle(sunWorldTransformation, earthTransformation, earthRotation, earthRevolution, glm::vec3(0.0f, 0.0f, 1.0f));
 
-        // Draw Mars
-        auto marsInitialTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 0.0f));
+        // Draw Moon as Earth as parent
+        auto moonTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(4.0f, 0.0f, 0.0f));
+        static float moonRotation = 0.0f;
+        moonRotation += 1.0f;
+        static float moonRevolution = 0.0f;
+        moonRevolution += 1.0f;
+        auto moonWorldTransformation = drawTriangle(earthWorldTransformation, moonTransformation, moonRotation, moonRevolution, glm::vec3(1.0f, 1.0f, 1.0f));
+
+        // Draw Mars as Sun as parent
+        auto marsTransformation = glm::translate(glm::mat4(1.0f), glm::vec3(12.0f, 0.0f, 0.0f));
         static float marsRotation = 0.0f;
         marsRotation += 1.0f;
         static float marsRevolution = 0.0f;
         marsRevolution += 0.25f;
-        drawTriangle(sunIntialTransformation, marsInitialTransformation, marsRotation, marsRevolution, glm::vec3(1.0f, 0.0f, 0.0f));
+        drawTriangle(sunWorldTransformation, marsTransformation, marsRotation, marsRevolution, glm::vec3(1.0f, 0.0f, 0.0f));
 
         // Swap buffers
         glfwSwapBuffers(window);
